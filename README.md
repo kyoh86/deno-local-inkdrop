@@ -73,6 +73,32 @@ deno task lint
 deno task fmt:check
 ```
 
+## Release
+
+1. Update version in `deno.json`.
+2. Update `CHANGELOG.md`.
+3. Run checks:
+
+```sh
+deno task test
+deno task lint
+deno task fmt:check
+deno doc --lint mod.ts
+```
+
+4. Tag and push:
+
+```sh
+git tag vX.Y.Z
+git push --tags
+```
+
+5. Publish to JSR:
+
+```sh
+deno publish
+```
+
 ## Examples
 
 See `examples/list_notes.ts` for a real request against a local Inkdrop server.
