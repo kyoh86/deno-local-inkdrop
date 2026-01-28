@@ -19,14 +19,14 @@ export interface RequestOptions {
   signal?: AbortSignal;
 }
 
-export class InkdropError extends Error {
+export class InkdropError<T = unknown> extends Error {
   status: number;
   statusText: string;
-  body?: unknown;
+  body?: T;
 
   constructor(
     message: string,
-    opts: { status: number; statusText: string; body?: unknown },
+    opts: { status: number; statusText: string; body?: T },
   ) {
     super(message);
     this.name = "InkdropError";
@@ -155,7 +155,7 @@ export class InkdropClient {
         {
           status: response.status,
           statusText: response.statusText,
-          body: payload,
+          body: payload as T | null,
         },
       );
     }

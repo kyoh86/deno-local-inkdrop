@@ -32,8 +32,8 @@ const client = new InkdropClient({
 
 ## Errors
 
-On non-2xx responses, requests throw `InkdropError` with `status`, `statusText`,
-and `body`.
+On non-2xx responses, requests throw `InkdropError<T>` with `status`,
+`statusText`, and `body`.
 
 ## API
 
