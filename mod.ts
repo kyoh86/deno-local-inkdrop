@@ -1,5 +1,6 @@
 import { encodeBase64 } from "@std/encoding/base64";
 import { as, ensure, is } from "@core/unknownutil";
+import type { Predicate } from "@core/unknownutil";
 
 export type FetchLike = typeof fetch;
 
@@ -23,7 +24,10 @@ export class InkdropError extends Error {
   statusText: string;
   body?: unknown;
 
-  constructor(message: string, opts: { status: number; statusText: string; body?: unknown }) {
+  constructor(
+    message: string,
+    opts: { status: number; statusText: string; body?: unknown },
+  ) {
     super(message);
     this.name = "InkdropError";
     this.status = opts.status;
@@ -33,11 +37,17 @@ export class InkdropError extends Error {
 }
 
 export function basicAuthHeader(username: string, password: string): string {
-  const encoded = encodeBase64(new TextEncoder().encode(`${username}:${password}`));
+  const encoded = encodeBase64(
+    new TextEncoder().encode(`${username}:${password}`),
+  );
   return `Basic ${encoded}`;
 }
 
-function buildUrl(baseUrl: string, path: string, params?: RequestOptions["params"]): URL {
+function buildUrl(
+  baseUrl: string,
+  path: string,
+  params?: RequestOptions["params"],
+): URL {
   const url = new URL(path, baseUrl);
   if (!params) return url;
 
@@ -86,7 +96,10 @@ export class InkdropClient {
     this.fetcher = options.fetch ?? fetch;
     this.defaultHeaders = new Headers(options.headers ?? {});
     if (!this.defaultHeaders.has("Authorization")) {
-      this.defaultHeaders.set("Authorization", basicAuthHeader(this.username, this.password));
+      this.defaultHeaders.set(
+        "Authorization",
+        basicAuthHeader(this.username, this.password),
+      );
     }
     if (!this.defaultHeaders.has("Accept")) {
       this.defaultHeaders.set("Accept", "application/json");
@@ -154,7 +167,11 @@ export class InkdropClient {
     return this.request<T>("GET", path, options);
   }
 
-  post<T>(path: string, body?: unknown, options: Omit<RequestOptions, "body"> = {}): Promise<T> {
+  post<T>(
+    path: string,
+    body?: unknown,
+    options: Omit<RequestOptions, "body"> = {},
+  ): Promise<T> {
     return this.request<T>("POST", path, { ...options, body });
   }
 
@@ -272,26 +289,26 @@ export interface FileDoc extends InkdropDocBase {
 
 export type FileInput = Partial<FileDoc> & { name: string };
 
-export const isInkdropServerInfo = is.ObjectOf({
+export const isInkdropServerInfo: Predicate<InkdropServerInfo> = is.ObjectOf({
   app: is.String,
   version: is.String,
   apiVersion: is.String,
 });
 
-export const isMutationResponse = is.ObjectOf({
+export const isMutationResponse: Predicate<MutationResponse> = is.ObjectOf({
   ok: is.Boolean,
   id: is.String,
   rev: is.String,
 });
 
-export const isInkdropDocBase = is.ObjectOf({
+export const isInkdropDocBase: Predicate<InkdropDocBase> = is.ObjectOf({
   _id: is.String,
   _rev: is.String,
   createdAt: as.Optional(is.Number),
   updatedAt: as.Optional(is.Number),
 });
 
-const isNoteStatus = is.UnionOf([
+const isNoteStatus: Predicate<NoteDoc["status"]> = is.UnionOf([
   is.LiteralOf("none"),
   is.LiteralOf("active"),
   is.LiteralOf("onHold"),
@@ -299,12 +316,12 @@ const isNoteStatus = is.UnionOf([
   is.LiteralOf("dropped"),
 ]);
 
-const isNoteShare = is.UnionOf([
+const isNoteShare: Predicate<NonNullable<NoteDoc["share"]>> = is.UnionOf([
   is.LiteralOf("private"),
   is.LiteralOf("public"),
 ]);
 
-export const isNoteDoc = is.IntersectionOf([
+export const isNoteDoc: Predicate<NoteDoc> = is.IntersectionOf([
   isInkdropDocBase,
   is.ObjectOf({
     doctype: is.LiteralOf("markdown"),
@@ -321,7 +338,7 @@ export const isNoteDoc = is.IntersectionOf([
   }),
 ]);
 
-export const isBookDoc = is.IntersectionOf([
+export const isBookDoc: Predicate<BookDoc> = is.IntersectionOf([
   isInkdropDocBase,
   is.ObjectOf({
     name: is.String,
@@ -329,7 +346,7 @@ export const isBookDoc = is.IntersectionOf([
   }),
 ]);
 
-export const isTagDoc = is.IntersectionOf([
+export const isTagDoc: Predicate<TagDoc> = is.IntersectionOf([
   isInkdropDocBase,
   is.ObjectOf({
     name: is.String,
@@ -338,14 +355,14 @@ export const isTagDoc = is.IntersectionOf([
   }),
 ]);
 
-export const isAttachmentData = is.ObjectOf({
+export const isAttachmentData: Predicate<AttachmentData> = is.ObjectOf({
   digest: is.String,
   content_type: is.String,
   revpos: is.Number,
   data: as.Optional(is.Jsonable),
 });
 
-export const isFileDoc = is.IntersectionOf([
+export const isFileDoc: Predicate<FileDoc> = is.IntersectionOf([
   isInkdropDocBase,
   is.ObjectOf({
     name: is.String,
@@ -358,7 +375,7 @@ export const isFileDoc = is.IntersectionOf([
   }),
 ]);
 
-export const isAnyDoc = is.UnionOf([
+export const isAnyDoc: Predicate<NoteDoc | BookDoc | TagDoc | FileDoc> = is.UnionOf([
   isNoteDoc,
   isBookDoc,
   isTagDoc,
@@ -432,7 +449,10 @@ export class FilesAPI {
 export class DocsAPI {
   constructor(private readonly client: InkdropClient) {}
 
-  get<T = NoteDoc | BookDoc | TagDoc | FileDoc>(docId: DocId, params?: DocGetParams): Promise<T> {
+  get<T = NoteDoc | BookDoc | TagDoc | FileDoc>(
+    docId: DocId,
+    params?: DocGetParams,
+  ): Promise<T> {
     return this.client.get<unknown>(`/${docId}`, { params }).then((value) =>
       ensure(value, isAnyDoc) as T
     );
