@@ -17,3 +17,7 @@ jobs:
           deno-version: v1.x
       - name: Test
         run: deno task test
+      - name: Lint
+        run: deno task lint
+      - name: Format
+        run: deno task fmt:check

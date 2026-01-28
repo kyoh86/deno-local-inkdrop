@@ -69,6 +69,8 @@ Types:
 
 ```sh
 deno task test
+deno task lint
+deno task fmt:check
 ```
 
 ## Examples
