@@ -24,17 +24,21 @@ const client = new InkdropClient({
 
 ## Authentication & Bind Address
 
-- Inkdrop Local HTTP Server uses Basic auth with a username/password you set in Inkdrop.
-- The server usually binds to `127.0.0.1`. Using `http://127.0.0.1:19840` is the most reliable default.
+- Inkdrop Local HTTP Server uses Basic auth with a username/password you set in
+  Inkdrop.
+- The server usually binds to `127.0.0.1`. Using `http://127.0.0.1:19840` is the
+  most reliable default.
 - If you change the bind address in Inkdrop, update `baseUrl` accordingly.
 
 ## Errors
 
-On non-2xx responses, requests throw `InkdropError` with `status`, `statusText`, and `body`.
+On non-2xx responses, requests throw `InkdropError` with `status`, `statusText`,
+and `body`.
 
 ## API
 
 Low-level:
+
 - `new InkdropClient({ baseUrl?, username, password, fetch?, headers? })`
 - `client.request(method, path, { params?, headers?, body?, signal? })`
 - `client.get(path, options)`
@@ -43,6 +47,7 @@ Low-level:
 - `basicAuthHeader(username, password)`
 
 High-level (resources):
+
 - `client.notes.list({ keyword?, limit?, skip?, sort?, descending? })`
 - `client.notes.upsert(note)`
 - `client.books.list({ limit?, skip? })`
@@ -55,6 +60,7 @@ High-level (resources):
 - `client.docs.delete(docId)`
 
 Types:
+
 - `NoteDoc`, `BookDoc`, `TagDoc`, `FileDoc`
 - `NoteInput`, `BookInput`, `TagInput`, `FileInput`
 

@@ -5,13 +5,19 @@ const username = Deno.env.get("INKDROP_USERNAME");
 const password = Deno.env.get("INKDROP_PASSWORD");
 
 if (!username || !password) {
-  console.error("Set INKDROP_USERNAME and INKDROP_PASSWORD environment variables.");
+  console.error(
+    "Set INKDROP_USERNAME and INKDROP_PASSWORD environment variables.",
+  );
   Deno.exit(1);
 }
 
 const client = new InkdropClient({ baseUrl, username, password });
 
-const notes = await client.notes.list({ limit: 10, sort: "updatedAt", descending: true });
+const notes = await client.notes.list({
+  limit: 10,
+  sort: "updatedAt",
+  descending: true,
+});
 for (const note of notes) {
   console.log(`${note._id}\t${note.title ?? "(untitled)"}`);
 }
