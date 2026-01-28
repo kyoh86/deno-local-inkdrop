@@ -1,5 +1,5 @@
 {
-  "name": "@kyoh86/deno-local-inkdrop",
+  "name": "@kyoh86/local-inkdrop",
   "version": "0.1.0",
   "license": "MIT",
   "exports": "./mod.ts",
