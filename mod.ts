@@ -1,6 +1,6 @@
 import { encodeBase64 } from "@std/encoding/base64";
 import { as, ensure, is } from "@core/unknownutil";
-import type { Predicate } from "@core/unknownutil";
+import type { Jsonable, Predicate } from "@core/unknownutil";
 
 export type FetchLike = typeof fetch;
 
@@ -277,7 +277,7 @@ export interface AttachmentData {
   digest: string;
   content_type: string;
   revpos: number;
-  data?: string | Record<string, unknown>;
+  data?: Jsonable;
 }
 
 export interface FileDoc extends InkdropDocBase {
