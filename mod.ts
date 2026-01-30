@@ -16,8 +16,8 @@ export interface InkdropClientOptions {
 }
 
 /** Low-level request options. */
-export interface RequestOptions {
-  params?: Params;
+export interface RequestOptions<TParams extends Params = Params> {
+  params?: TParams;
   headers?: HeadersInit;
   body?: unknown;
   signal?: AbortSignal;
@@ -49,10 +49,10 @@ export function basicAuthHeader(username: string, password: string): string {
   return `Basic ${encoded}`;
 }
 
-function buildUrl(
+function buildUrl<TParams extends Params = Params>(
   baseUrl: string,
   path: string,
-  params?: RequestOptions["params"],
+  params?: RequestOptions<TParams>["params"],
 ): URL {
   const url = new URL(path, baseUrl);
   if (!params) return url;
@@ -124,10 +124,10 @@ export class InkdropClient {
   }
 
   /** Perform a low-level HTTP request. */
-  async request(
+  async request<TParams extends Params = Params>(
     method: string,
     path: string,
-    options: RequestOptions = {},
+    options: RequestOptions<TParams> = {},
   ): Promise<unknown> {
     const url = buildUrl(this.baseUrl, path, options.params);
     const headers = new Headers(this.defaultHeaders);
@@ -177,26 +177,26 @@ export class InkdropClient {
   }
 
   /** GET helper. */
-  get(
+  get<TParams extends Params = Params>(
     path: string,
-    options?: Omit<RequestOptions, "body">,
+    options?: Omit<RequestOptions<TParams>, "body">,
   ): Promise<unknown> {
     return this.request("GET", path, options);
   }
 
   /** POST helper. */
-  post(
+  post<TParams extends Params = Params>(
     path: string,
     body?: unknown,
-    options: Omit<RequestOptions, "body"> = {},
+    options: Omit<RequestOptions<TParams>, "body"> = {},
   ): Promise<unknown> {
     return this.request("POST", path, { ...options, body });
   }
 
   /** DELETE helper. */
-  delete(
+  delete<TParams extends Params = Params>(
     path: string,
-    options?: Omit<RequestOptions, "body">,
+    options?: Omit<RequestOptions<TParams>, "body">,
   ): Promise<unknown> {
     return this.request("DELETE", path, options);
   }
@@ -444,16 +444,21 @@ export class NotesAPI {
   constructor(private readonly client: InkdropClient) {}
 
   /** List notes with optional query params. */
-  list<T = NoteDoc>(params?: NoteListParams): Promise<T[]> {
-    return this.client.get("/notes", { params }).then((value) =>
-      ensure(value, is.ArrayOf(isNoteDoc)) as T[]
+  async list(
+    options?: RequestOptions<NoteListParams>,
+  ): Promise<NoteDoc[]> {
+    return await this.client.get("/notes", options).then((value) =>
+      ensure(value, is.ArrayOf(isNoteDoc))
     );
   }
 
   /** Create or update a note. */
-  upsert<T = MutationResponse>(note: NoteInput): Promise<T> {
-    return this.client.post("/notes", note).then((value) =>
-      ensure(value, isMutationResponse) as T
+  async upsert(
+    note: NoteInput,
+    options?: RequestOptions,
+  ): Promise<MutationResponse> {
+    return await this.client.post("/notes", note, options).then((value) =>
+      ensure(value, isMutationResponse)
     );
   }
 }
@@ -463,16 +468,21 @@ export class BooksAPI {
   constructor(private readonly client: InkdropClient) {}
 
   /** List books with optional query params. */
-  list<T = BookDoc>(params?: BookListParams): Promise<T[]> {
-    return this.client.get("/books", { params }).then((value) =>
-      ensure(value, is.ArrayOf(isBookDoc)) as T[]
+  async list(
+    options?: RequestOptions<BookListParams>,
+  ): Promise<BookDoc[]> {
+    return await this.client.get("/books", options).then((value) =>
+      ensure(value, is.ArrayOf(isBookDoc))
     );
   }
 
   /** Create or update a book. */
-  upsert<T = MutationResponse>(book: BookInput): Promise<T> {
-    return this.client.post("/books", book).then((value) =>
-      ensure(value, isMutationResponse) as T
+  async upsert(
+    book: BookInput,
+    options?: RequestOptions,
+  ): Promise<MutationResponse> {
+    return await this.client.post("/books", book, options).then((value) =>
+      ensure(value, isMutationResponse)
     );
   }
 }
@@ -482,16 +492,19 @@ export class TagsAPI {
   constructor(private readonly client: InkdropClient) {}
 
   /** List tags with optional query params. */
-  list<T = TagDoc>(params?: TagListParams): Promise<T[]> {
-    return this.client.get("/tags", { params }).then((value) =>
-      ensure(value, is.ArrayOf(isTagDoc)) as T[]
+  async list(options?: RequestOptions<TagListParams>): Promise<TagDoc[]> {
+    return await this.client.get("/tags", options).then((value) =>
+      ensure(value, is.ArrayOf(isTagDoc))
     );
   }
 
   /** Create or update a tag. */
-  upsert<T = MutationResponse>(tag: TagInput): Promise<T> {
-    return this.client.post("/tags", tag).then((value) =>
-      ensure(value, isMutationResponse) as T
+  async upsert(
+    tag: TagInput,
+    options?: RequestOptions,
+  ): Promise<MutationResponse> {
+    return await this.client.post("/tags", tag, options).then((value) =>
+      ensure(value, isMutationResponse)
     );
   }
 }
@@ -501,16 +514,19 @@ export class FilesAPI {
   constructor(private readonly client: InkdropClient) {}
 
   /** List files with optional query params. */
-  list<T = FileDoc>(params?: FileListParams): Promise<T[]> {
-    return this.client.get("/files", { params }).then((value) =>
-      ensure(value, is.ArrayOf(isFileDoc)) as T[]
+  async list(options?: RequestOptions<FileListParams>): Promise<FileDoc[]> {
+    return await this.client.get("/files", options).then((value) =>
+      ensure(value, is.ArrayOf(isFileDoc))
     );
   }
 
   /** Create a file document. */
-  create<T = MutationResponse>(file: FileInput): Promise<T> {
-    return this.client.post("/files", file).then((value) =>
-      ensure(value, isMutationResponse) as T
+  async create(
+    file: FileInput,
+    options?: RequestOptions,
+  ): Promise<MutationResponse> {
+    return await this.client.post("/files", file, options).then((value) =>
+      ensure(value, isMutationResponse)
     );
   }
 }
@@ -520,19 +536,22 @@ export class DocsAPI {
   constructor(private readonly client: InkdropClient) {}
 
   /** Get a document by id. */
-  get<T = NoteDoc | BookDoc | TagDoc | FileDoc>(
+  async get(
     docId: DocId,
-    params?: DocGetParams,
-  ): Promise<T> {
-    return this.client.get(`/${docId}`, { params }).then((value) =>
-      ensure(value, isAnyDoc) as T
+    options?: RequestOptions<DocGetParams>,
+  ): Promise<NoteDoc | BookDoc | TagDoc | FileDoc> {
+    return await this.client.get(`/${docId}`, options).then((value) =>
+      ensure(value, isAnyDoc)
     );
   }
 
   /** Delete a document by id. */
-  delete<T = MutationResponse>(docId: DocId): Promise<T> {
-    return this.client.delete(`/${docId}`).then((value) =>
-      ensure(value, isMutationResponse) as T
+  async delete(
+    docId: DocId,
+    options?: RequestOptions,
+  ): Promise<MutationResponse> {
+    return await this.client.delete(`/${docId}`, options).then((value) =>
+      ensure(value, isMutationResponse)
     );
   }
 }

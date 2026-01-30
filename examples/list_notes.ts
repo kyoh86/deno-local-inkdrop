@@ -14,9 +14,11 @@ if (!username || !password) {
 const client = new InkdropClient({ baseUrl, username, password });
 
 const notes = await client.notes.list({
-  limit: 10,
-  sort: "updatedAt",
-  descending: true,
+  params: {
+    limit: 10,
+    sort: "updatedAt",
+    descending: true,
+  },
 });
 for (const note of notes) {
   console.log(`${note._id}\t${note.title ?? "(untitled)"}`);
