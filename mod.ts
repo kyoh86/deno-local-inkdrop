@@ -124,11 +124,11 @@ export class InkdropClient {
   }
 
   /** Perform a low-level HTTP request. */
-  async request<T>(
+  async request(
     method: string,
     path: string,
     options: RequestOptions = {},
-  ): Promise<T> {
+  ): Promise<unknown> {
     const url = buildUrl(this.baseUrl, path, options.params);
     const headers = new Headers(this.defaultHeaders);
     if (options.headers) {
@@ -168,31 +168,37 @@ export class InkdropClient {
         {
           status: response.status,
           statusText: response.statusText,
-          body: payload as T | null,
+          body: payload as unknown,
         },
       );
     }
 
-    return payload as T;
+    return payload as unknown;
   }
 
   /** GET helper. */
-  get<T>(path: string, options?: Omit<RequestOptions, "body">): Promise<T> {
-    return this.request<T>("GET", path, options);
+  get(
+    path: string,
+    options?: Omit<RequestOptions, "body">,
+  ): Promise<unknown> {
+    return this.request("GET", path, options);
   }
 
   /** POST helper. */
-  post<T>(
+  post(
     path: string,
     body?: unknown,
     options: Omit<RequestOptions, "body"> = {},
-  ): Promise<T> {
-    return this.request<T>("POST", path, { ...options, body });
+  ): Promise<unknown> {
+    return this.request("POST", path, { ...options, body });
   }
 
   /** DELETE helper. */
-  delete<T>(path: string, options?: Omit<RequestOptions, "body">): Promise<T> {
-    return this.request<T>("DELETE", path, options);
+  delete(
+    path: string,
+    options?: Omit<RequestOptions, "body">,
+  ): Promise<unknown> {
+    return this.request("DELETE", path, options);
   }
 }
 
@@ -439,14 +445,14 @@ export class NotesAPI {
 
   /** List notes with optional query params. */
   list<T = NoteDoc>(params?: NoteListParams): Promise<T[]> {
-    return this.client.get<unknown>("/notes", { params }).then((value) =>
+    return this.client.get("/notes", { params }).then((value) =>
       ensure(value, is.ArrayOf(isNoteDoc)) as T[]
     );
   }
 
   /** Create or update a note. */
   upsert<T = MutationResponse>(note: NoteInput): Promise<T> {
-    return this.client.post<unknown>("/notes", note).then((value) =>
+    return this.client.post("/notes", note).then((value) =>
       ensure(value, isMutationResponse) as T
     );
   }
@@ -458,14 +464,14 @@ export class BooksAPI {
 
   /** List books with optional query params. */
   list<T = BookDoc>(params?: BookListParams): Promise<T[]> {
-    return this.client.get<unknown>("/books", { params }).then((value) =>
+    return this.client.get("/books", { params }).then((value) =>
       ensure(value, is.ArrayOf(isBookDoc)) as T[]
     );
   }
 
   /** Create or update a book. */
   upsert<T = MutationResponse>(book: BookInput): Promise<T> {
-    return this.client.post<unknown>("/books", book).then((value) =>
+    return this.client.post("/books", book).then((value) =>
       ensure(value, isMutationResponse) as T
     );
   }
@@ -477,14 +483,14 @@ export class TagsAPI {
 
   /** List tags with optional query params. */
   list<T = TagDoc>(params?: TagListParams): Promise<T[]> {
-    return this.client.get<unknown>("/tags", { params }).then((value) =>
+    return this.client.get("/tags", { params }).then((value) =>
       ensure(value, is.ArrayOf(isTagDoc)) as T[]
     );
   }
 
   /** Create or update a tag. */
   upsert<T = MutationResponse>(tag: TagInput): Promise<T> {
-    return this.client.post<unknown>("/tags", tag).then((value) =>
+    return this.client.post("/tags", tag).then((value) =>
       ensure(value, isMutationResponse) as T
     );
   }
@@ -496,14 +502,14 @@ export class FilesAPI {
 
   /** List files with optional query params. */
   list<T = FileDoc>(params?: FileListParams): Promise<T[]> {
-    return this.client.get<unknown>("/files", { params }).then((value) =>
+    return this.client.get("/files", { params }).then((value) =>
       ensure(value, is.ArrayOf(isFileDoc)) as T[]
     );
   }
 
   /** Create a file document. */
   create<T = MutationResponse>(file: FileInput): Promise<T> {
-    return this.client.post<unknown>("/files", file).then((value) =>
+    return this.client.post("/files", file).then((value) =>
       ensure(value, isMutationResponse) as T
     );
   }
@@ -518,14 +524,14 @@ export class DocsAPI {
     docId: DocId,
     params?: DocGetParams,
   ): Promise<T> {
-    return this.client.get<unknown>(`/${docId}`, { params }).then((value) =>
+    return this.client.get(`/${docId}`, { params }).then((value) =>
       ensure(value, isAnyDoc) as T
     );
   }
 
   /** Delete a document by id. */
   delete<T = MutationResponse>(docId: DocId): Promise<T> {
-    return this.client.delete<unknown>(`/${docId}`).then((value) =>
+    return this.client.delete(`/${docId}`).then((value) =>
       ensure(value, isMutationResponse) as T
     );
   }
