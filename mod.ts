@@ -301,9 +301,9 @@ export interface DocGetParams extends Params {
 }
 
 /** Mutation response from create/update/delete. */
-export interface MutationResponse {
+export interface MutationResponse<TId extends string = DocId> {
   ok: boolean;
-  id: string;
+  id: TId;
   rev: string;
 }
 
@@ -387,9 +387,41 @@ export const isInkdropServerInfo: Predicate<InkdropServerInfo> = is.ObjectOf({
 /** Runtime validator for MutationResponse. */
 export const isMutationResponse: Predicate<MutationResponse> = is.ObjectOf({
   ok: is.Boolean,
-  id: is.String,
+  id: isDocId,
   rev: is.String,
 });
+
+/** Runtime validator for MutationResponse<NoteId>. */
+export const isNoteMutationResponse: Predicate<MutationResponse<NoteId>> = is
+  .ObjectOf({
+    ok: is.Boolean,
+    id: isNoteId,
+    rev: is.String,
+  });
+
+/** Runtime validator for MutationResponse<BookId>. */
+export const isBookMutationResponse: Predicate<MutationResponse<BookId>> = is
+  .ObjectOf({
+    ok: is.Boolean,
+    id: isBookId,
+    rev: is.String,
+  });
+
+/** Runtime validator for MutationResponse<TagId>. */
+export const isTagMutationResponse: Predicate<MutationResponse<TagId>> = is
+  .ObjectOf({
+    ok: is.Boolean,
+    id: isTagId,
+    rev: is.String,
+  });
+
+/** Runtime validator for MutationResponse<FileId>. */
+export const isFileMutationResponse: Predicate<MutationResponse<FileId>> = is
+  .ObjectOf({
+    ok: is.Boolean,
+    id: isFileId,
+    rev: is.String,
+  });
 
 /** Runtime validator for InkdropDocBase. */
 export const isInkdropDocBase: Predicate<InkdropDocBase> = is.ObjectOf({
@@ -502,7 +534,7 @@ export class NotesAPI {
     options?: RequestOptions,
   ): Promise<MutationResponse> {
     return await this.client.post("/notes", note, options).then((value) =>
-      ensure(value, isMutationResponse)
+      ensure(value, isNoteMutationResponse)
     );
   }
 }
@@ -526,7 +558,7 @@ export class BooksAPI {
     options?: RequestOptions,
   ): Promise<MutationResponse> {
     return await this.client.post("/books", book, options).then((value) =>
-      ensure(value, isMutationResponse)
+      ensure(value, isBookMutationResponse)
     );
   }
 }
@@ -548,7 +580,7 @@ export class TagsAPI {
     options?: RequestOptions,
   ): Promise<MutationResponse> {
     return await this.client.post("/tags", tag, options).then((value) =>
-      ensure(value, isMutationResponse)
+      ensure(value, isTagMutationResponse)
     );
   }
 }
@@ -570,7 +602,7 @@ export class FilesAPI {
     options?: RequestOptions,
   ): Promise<MutationResponse> {
     return await this.client.post("/files", file, options).then((value) =>
-      ensure(value, isMutationResponse)
+      ensure(value, isFileMutationResponse)
     );
   }
 }
