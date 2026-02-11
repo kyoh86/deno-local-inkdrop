@@ -611,6 +611,26 @@ export class FilesAPI {
 export class DocsAPI {
   constructor(private readonly client: InkdropClient) {}
 
+  async get(
+    noteId: NoteId,
+    options?: RequestOptions<DocGetParams>,
+  ): Promise<NoteDoc>;
+
+  async get(
+    bookId: BookId,
+    options?: RequestOptions<DocGetParams>,
+  ): Promise<BookDoc>;
+
+  async get(
+    tagId: TagId,
+    options?: RequestOptions<DocGetParams>,
+  ): Promise<TagDoc>;
+
+  async get(
+    fileId: FileId,
+    options?: RequestOptions<DocGetParams>,
+  ): Promise<FileDoc>;
+
   /** Get a document by id. */
   async get(
     docId: DocId,
