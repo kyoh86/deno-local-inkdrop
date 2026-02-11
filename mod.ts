@@ -532,7 +532,7 @@ export class NotesAPI {
   async upsert(
     note: NoteInput,
     options?: RequestOptions,
-  ): Promise<MutationResponse> {
+  ): Promise<MutationResponse<NoteId>> {
     return await this.client.post("/notes", note, options).then((value) =>
       ensure(value, isNoteMutationResponse)
     );
@@ -556,7 +556,7 @@ export class BooksAPI {
   async upsert(
     book: BookInput,
     options?: RequestOptions,
-  ): Promise<MutationResponse> {
+  ): Promise<MutationResponse<BookId>> {
     return await this.client.post("/books", book, options).then((value) =>
       ensure(value, isBookMutationResponse)
     );
@@ -578,7 +578,7 @@ export class TagsAPI {
   async upsert(
     tag: TagInput,
     options?: RequestOptions,
-  ): Promise<MutationResponse> {
+  ): Promise<MutationResponse<TagId>> {
     return await this.client.post("/tags", tag, options).then((value) =>
       ensure(value, isTagMutationResponse)
     );
@@ -600,7 +600,7 @@ export class FilesAPI {
   async create(
     file: FileInput,
     options?: RequestOptions,
-  ): Promise<MutationResponse> {
+  ): Promise<MutationResponse<FileId>> {
     return await this.client.post("/files", file, options).then((value) =>
       ensure(value, isFileMutationResponse)
     );
@@ -640,6 +640,26 @@ export class DocsAPI {
       ensure(value, isAnyDoc)
     );
   }
+
+  async delete(
+    noteId: NoteId,
+    options?: RequestOptions,
+  ): Promise<MutationResponse<NoteId>>;
+
+  async delete(
+    bookId: BookId,
+    options?: RequestOptions,
+  ): Promise<MutationResponse<BookId>>;
+
+  async delete(
+    tagId: TagId,
+    options?: RequestOptions,
+  ): Promise<MutationResponse<TagId>>;
+
+  async delete(
+    fileId: FileId,
+    options?: RequestOptions,
+  ): Promise<MutationResponse<FileId>>;
 
   /** Delete a document by id. */
   async delete(
